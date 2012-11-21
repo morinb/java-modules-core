@@ -13,8 +13,7 @@ public class PutToFrontModuleFrameListener implements ActionListener {
 
     private final IWindowsManager wm;
 
-    public PutToFrontModuleFrameListener(IWindowsManager windowManager,
-            ModuleFrame frame) {
+    public PutToFrontModuleFrameListener(IWindowsManager windowManager, ModuleFrame frame) {
         this.frame = frame;
         this.wm = windowManager;
     }

@@ -42,8 +42,7 @@ public class ModulesLoader {
 
                 Manifest manifest = jarFile.getManifest();
 
-                String moduleClassname = manifest.getMainAttributes().getValue(
-                        "Module-Class");
+                String moduleClassname = manifest.getMainAttributes().getValue("Module-Class");
 
                 modulesClassnames.add(moduleClassname);
                 modulesFilesURL.add(moduleFile.toURI().toURL());
@@ -57,9 +56,8 @@ public class ModulesLoader {
         AccessController.doPrivileged(new PrivilegedAction<Object>() {
             @Override
             public Object run() {
-                classLoader = new URLClassLoader(modulesFilesURL
-                        .toArray(new URL[modulesFilesURL.size()]),
-                        ModulesLoader.class.getClassLoader());
+                classLoader = new URLClassLoader(modulesFilesURL.toArray(new URL[modulesFilesURL.size()]), ModulesLoader.class
+                        .getClassLoader());
 
                 return null;
             }
@@ -69,8 +67,7 @@ public class ModulesLoader {
             for (String clazz : modulesClassnames) {
 
                 try {
-                    Class<?> moduleClass = Class.forName(clazz, true,
-                            classLoader);
+                    Class<?> moduleClass = Class.forName(clazz, true, classLoader);
 
                     if (IModule.class.isAssignableFrom(moduleClass)) {
                         @SuppressWarnings("unchecked")
@@ -101,8 +98,7 @@ public class ModulesLoader {
     static class ModulesFilter implements FileFilter {
         @Override
         public boolean accept(File pathname) {
-            return pathname.isFile()
-                    && pathname.getName().toLowerCase().endsWith(".jar");
+            return pathname.isFile() && pathname.getName().toLowerCase().endsWith(".jar");
         }
     }
 

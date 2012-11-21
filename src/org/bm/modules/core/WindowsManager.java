@@ -65,15 +65,13 @@ public class WindowsManager implements IWindowsManager {
     }
 
     public void fireModuleFrameAdded(ModuleFrame frame) {
-        for (ModuleFrameListener l : listeners
-                .getListeners(ModuleFrameListener.class)) {
+        for (ModuleFrameListener l : listeners.getListeners(ModuleFrameListener.class)) {
             l.windowAdded(frame);
         }
     }
 
     public void fireModuleFrameRemoved(ModuleFrame frame) {
-        for (ModuleFrameListener l : listeners
-                .getListeners(ModuleFrameListener.class)) {
+        for (ModuleFrameListener l : listeners.getListeners(ModuleFrameListener.class)) {
             l.windowRemoved(frame);
         }
     }
@@ -92,9 +90,21 @@ public class WindowsManager implements IWindowsManager {
             desktopPane.setSelectedFrame(frame);
             frame.setSelected(true);
         } catch (PropertyVetoException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
+    }
+
+    @Override
+    public void centerOnContainer(ModuleFrame frame) {
+        int x = (desktopPane.getWidth() - frame.getWidth()) / 2;
+        int y = (desktopPane.getHeight() - frame.getHeight()) / 2;
+
+        frame.setLocation(x, y);
+    }
+
+    @Override
+    public void refreshDisplay() {
+        this.desktopPane.invalidate();
     }
 }

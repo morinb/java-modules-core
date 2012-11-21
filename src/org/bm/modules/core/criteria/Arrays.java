@@ -5,8 +5,7 @@ import java.util.Collection;
 import java.util.Comparator;
 
 public class Arrays {
-    public static <F, T> Collection<T> filter(boolean keepNulls,
-            Collection<F> fromList, Function<F, T> function) {
+    public static <F, T> Collection<T> filter(boolean keepNulls, Collection<F> fromList, Function<F, T> function) {
         Collection<T> retour = new ArrayList<T>();
 
         for (F from : fromList) {
@@ -19,8 +18,7 @@ public class Arrays {
         return retour;
     }
 
-    public static <I> Collection<I> sort(Collection<I> fromList,
-            Comparator<I> comparator) {
+    public static <I> Collection<I> sort(Collection<I> fromList, Comparator<I> comparator) {
         if (null == fromList || fromList.size() == 0) {
             return fromList;
         }
@@ -30,8 +28,7 @@ public class Arrays {
         return java.util.Arrays.asList(values);
     }
 
-    public static <I> void quicksort(I[] fromList, Comparator<I> comparator,
-            int low, int high) {
+    public static <I> void quicksort(I[] fromList, Comparator<I> comparator, int low, int high) {
         int i = low, j = high;
         // Get the pivot element from the middle of the list
         I pivot = fromList[low + (high - low) / 2];

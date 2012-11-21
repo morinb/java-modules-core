@@ -19,6 +19,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
+import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
 import org.bm.modules.core.criteria.Arrays;
@@ -30,6 +31,8 @@ import org.bm.modules.core.loader.ModulesLoader;
 import org.bm.modules.shared.IModule;
 import org.bm.modules.shared.ModuleFrame;
 import org.bm.modules.shared.ModuleFrameListener;
+
+import de.javasoft.plaf.synthetica.SyntheticaStandardLookAndFeel;
 
 public class ModulesFrame extends JFrame {
 
@@ -62,6 +65,7 @@ public class ModulesFrame extends JFrame {
     }
 
     private void init() {
+        initLaF();
         componentContainer = new ComponentContainer();
         componentContainer.setWindowManager(new WindowsManager(desktopPane));
 
@@ -72,29 +76,31 @@ public class ModulesFrame extends JFrame {
             if (null != m.getModuleFrame()) {
                 m.getModuleFrame().setComponentContainer(componentContainer);
             }
-
         }
 
         createMenuBar();
 
-        componentContainer.getWindowManager().addModuleFrameListener(
-                new ModuleFrameListener() {
+        componentContainer.getWindowManager().addModuleFrameListener(new ModuleFrameListener() {
+            @Override
+            public void windowRemoved(ModuleFrame frame) {
+                updateWindowsMenu();
+            }
 
-                    @Override
-                    public void windowRemoved(ModuleFrame frame) {
-                        updateWindowsMenu();
-
-                    }
-
-                    @Override
-                    public void windowAdded(ModuleFrame frame) {
-                        updateWindowsMenu();
-
-                    }
-
-                });
+            @Override
+            public void windowAdded(ModuleFrame frame) {
+                updateWindowsMenu();
+            }
+        });
 
         displayAndCenterOnScreen();
+    }
+
+    private void initLaF() {
+        try {
+            UIManager.setLookAndFeel(new SyntheticaStandardLookAndFeel());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateWindowsMenu() {
@@ -106,12 +112,10 @@ public class ModulesFrame extends JFrame {
         menuWindows.addSeparator();
 
         int index = 1;
-        for (ModuleFrame frame : componentContainer.getWindowManager()
-                .getWindows()) {
+        for (ModuleFrame frame : componentContainer.getWindowManager().getWindows()) {
             JMenuItem menuItem = new JMenuItem(index + ". " + frame.getTitle());
             menuWindows.add(menuItem);
-            menuItem.addActionListener(new PutToFrontModuleFrameListener(
-                    componentContainer.getWindowManager(), frame));
+            menuItem.addActionListener(new PutToFrontModuleFrameListener(componentContainer.getWindowManager(), frame));
             index++;
         }
 
@@ -122,25 +126,21 @@ public class ModulesFrame extends JFrame {
     private void createMenuBar() {
         JMenuBar menubar = new JMenuBar();
 
-        JMenu menuFile = new JMenu(
-                Messages.getString("ModulesFrame.menuFile.title")); //$NON-NLS-1$
+        JMenu menuFile = new JMenu(Messages.getString("ModulesFrame.menuFile.title")); //$NON-NLS-1$
         menuFile.setMnemonic(KeyEvent.VK_F);
 
         populateMenu(menuFile, IModule.MENU_FILE);
         addExitMenuItem(menuFile);
 
-        JMenu menuOptions = new JMenu(
-                Messages.getString("ModulesFrame.menuOptions.title")); //$NON-NLS-1$
+        JMenu menuOptions = new JMenu(Messages.getString("ModulesFrame.menuOptions.title")); //$NON-NLS-1$
         menuOptions.setMnemonic(KeyEvent.VK_O);
         populateMenu(menuOptions, IModule.MENU_OPTIONS);
 
-        menuWindows = new JMenu(
-                Messages.getString("ModulesFrame.menuWindows.title"));
+        menuWindows = new JMenu(Messages.getString("ModulesFrame.menuWindows.title"));
         menuWindows.setMnemonic(KeyEvent.VK_W);
         populateMenu(menuWindows, IModule.MENU_WINDOWS);
 
-        JMenu menuHelp = new JMenu(
-                Messages.getString("ModulesFrame.menuHelp.title")); //$NON-NLS-1$
+        JMenu menuHelp = new JMenu(Messages.getString("ModulesFrame.menuHelp.title")); //$NON-NLS-1$
         menuHelp.setMnemonic(KeyEvent.VK_H);
         populateMenu(menuHelp, IModule.MENU_HELP);
 
@@ -155,16 +155,15 @@ public class ModulesFrame extends JFrame {
 
     private void populateMenu(final JMenu menu, final int menuIndex) {
         // Keeps only file menu modules.
-        Collection<IModule> modulesForMenu = Arrays.filter(false,
-                loadedModules, new Function<IModule, IModule>() {
-                    @Override
-                    public IModule apply(IModule input) {
-                        if (input.getMenuIndex() == menuIndex) {
-                            return input;
-                        }
-                        return null;
-                    }
-                });
+        Collection<IModule> modulesForMenu = Arrays.filter(false, loadedModules, new Function<IModule, IModule>() {
+            @Override
+            public IModule apply(IModule input) {
+                if (input.getMenuIndex() == menuIndex) {
+                    return input;
+                }
+                return null;
+            }
+        });
 
         // sort modules.
         modulesForMenu = Arrays.sort(modulesForMenu, new Comparator<IModule>() {
@@ -189,8 +188,7 @@ public class ModulesFrame extends JFrame {
                 menuItem.setAccelerator(module.getAccelerator());
             }
 
-            menuItem.addActionListener(new ModuleActionListener(
-                    componentContainer.getWindowManager(), module));
+            menuItem.addActionListener(new ModuleActionListener(componentContainer.getWindowManager(), module));
 
             menu.add(menuItem);
         }
@@ -202,8 +200,7 @@ public class ModulesFrame extends JFrame {
 
         JMenuItem menuItemExit = new JMenuItem("Exit");
         menuItemExit.setMnemonic(KeyEvent.VK_X);
-        menuItemExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4,
-                InputEvent.ALT_DOWN_MASK));
+        menuItemExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_DOWN_MASK));
         menuItemExit.addActionListener(new ActionListener() {
 
             @Override
@@ -219,15 +216,12 @@ public class ModulesFrame extends JFrame {
     private void displayAndCenterOnScreen() {
         Toolkit tk = Toolkit.getDefaultToolkit();
         Dimension screenSize = tk.getScreenSize();
-        Insets screenInsets = tk.getScreenInsets(this
-                .getGraphicsConfiguration());
+        Insets screenInsets = tk.getScreenInsets(this.getGraphicsConfiguration());
 
         int x = 0 + screenInsets.left;
         int y = 0 + screenInsets.top;
-        int width = (int) screenSize.getWidth() - screenInsets.right
-                - screenInsets.left;
-        int height = (int) screenSize.getHeight() - screenInsets.bottom
-                - screenInsets.top;
+        int width = (int) screenSize.getWidth() - screenInsets.right - screenInsets.left;
+        int height = (int) screenSize.getHeight() - screenInsets.bottom - screenInsets.top;
 
         this.setBounds(x, y, width, height);
         this.setLocationRelativeTo(null);
