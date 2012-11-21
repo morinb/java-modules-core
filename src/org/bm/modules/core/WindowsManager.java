@@ -9,10 +9,11 @@ import javax.swing.event.EventListenerList;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
-import org.bm.modules.core.listeners.ModuleFrameListener;
+import org.bm.modules.shared.IWindowsManager;
 import org.bm.modules.shared.ModuleFrame;
+import org.bm.modules.shared.ModuleFrameListener;
 
-public class WindowsManager {
+public class WindowsManager implements IWindowsManager {
    private final JDesktopPane desktopPane;
 
    private final List<ModuleFrame> windows;
@@ -25,6 +26,7 @@ public class WindowsManager {
       listeners = new EventListenerList();
    }
 
+   @Override
    public void addWindow(final ModuleFrame w) {
       desktopPane.add(w);
       windows.add(w);
@@ -41,6 +43,7 @@ public class WindowsManager {
       fireModuleFrameAdded(w);
    }
 
+   @Override
    public void removeWindow(ModuleFrame w) {
       desktopPane.remove(w);
       windows.remove(w);
@@ -68,6 +71,7 @@ public class WindowsManager {
       }
    }
 
+   @Override
    public List<ModuleFrame> getWindows() {
       return windows;
    }

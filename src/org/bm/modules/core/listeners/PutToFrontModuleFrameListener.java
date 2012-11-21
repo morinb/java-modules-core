@@ -4,18 +4,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
 
-import org.bm.modules.core.WindowsManager;
+import org.bm.modules.shared.IWindowsManager;
 import org.bm.modules.shared.ModuleFrame;
 
 public class PutToFrontModuleFrameListener implements ActionListener {
 
    private final ModuleFrame frame;
 
-   private final WindowsManager wm;
+   private final IWindowsManager wm;
 
-   public PutToFrontModuleFrameListener(WindowsManager wm, ModuleFrame frame) {
+   public PutToFrontModuleFrameListener(IWindowsManager windowManager, ModuleFrame frame) {
       this.frame = frame;
-      this.wm = wm;
+      this.wm = windowManager;
    }
 
    @Override

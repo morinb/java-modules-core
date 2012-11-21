@@ -25,17 +25,17 @@ import org.bm.modules.core.criteria.Arrays;
 import org.bm.modules.core.criteria.Function;
 import org.bm.modules.core.i18n.Messages;
 import org.bm.modules.core.listeners.ModuleActionListener;
-import org.bm.modules.core.listeners.ModuleFrameListener;
 import org.bm.modules.core.listeners.PutToFrontModuleFrameListener;
 import org.bm.modules.core.loader.ModulesLoader;
 import org.bm.modules.shared.IModule;
 import org.bm.modules.shared.ModuleFrame;
+import org.bm.modules.shared.ModuleFrameListener;
 
 public class ModulesFrame extends JFrame {
 
    private final JDesktopPane desktopPane = new JDesktopPane();
 
-   private WindowsManager windowsManager;
+   private ComponentContainer componentContainer;
 
    private JMenu menuWindows;
 
@@ -62,14 +62,22 @@ public class ModulesFrame extends JFrame {
    }
 
    private void init() {
-      windowsManager = new WindowsManager(desktopPane);
+      componentContainer = new ComponentContainer();
+      componentContainer.setWindowManager(new WindowsManager(desktopPane));
+
       this.setContentPane(desktopPane);
 
       loadedModules = ModulesLoader.loadModules();
+      for (IModule m : loadedModules) {
+         if (null != m.getModuleFrame()) {
+            m.getModuleFrame().setComponentContainer(componentContainer);
+         }
+
+      }
 
       createMenuBar();
 
-      windowsManager.addModuleFrameListener(new ModuleFrameListener() {
+      componentContainer.getWindowManager().addModuleFrameListener(new ModuleFrameListener() {
 
          @Override
          public void windowRemoved(ModuleFrame frame) {
@@ -97,10 +105,10 @@ public class ModulesFrame extends JFrame {
       menuWindows.addSeparator();
 
       int index = 1;
-      for (ModuleFrame frame : windowsManager.getWindows()) {
+      for (ModuleFrame frame : componentContainer.getWindowManager().getWindows()) {
          JMenuItem menuItem = new JMenuItem(index + ". " + frame.getTitle());
          menuWindows.add(menuItem);
-         menuItem.addActionListener(new PutToFrontModuleFrameListener(windowsManager, frame));
+         menuItem.addActionListener(new PutToFrontModuleFrameListener(componentContainer.getWindowManager(), frame));
          index++;
       }
 
@@ -173,7 +181,7 @@ public class ModulesFrame extends JFrame {
             menuItem.setAccelerator(module.getAccelerator());
          }
 
-         menuItem.addActionListener(new ModuleActionListener(windowsManager, module));
+         menuItem.addActionListener(new ModuleActionListener(componentContainer.getWindowManager(), module));
 
          menu.add(menuItem);
       }
