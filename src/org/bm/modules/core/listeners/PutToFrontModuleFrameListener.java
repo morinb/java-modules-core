@@ -9,26 +9,28 @@ import org.bm.modules.shared.ModuleFrame;
 
 public class PutToFrontModuleFrameListener implements ActionListener {
 
-   private final ModuleFrame frame;
+    private final ModuleFrame frame;
 
-   private final IWindowsManager wm;
+    private final IWindowsManager wm;
 
-   public PutToFrontModuleFrameListener(IWindowsManager windowManager, ModuleFrame frame) {
-      this.frame = frame;
-      this.wm = windowManager;
-   }
+    public PutToFrontModuleFrameListener(IWindowsManager windowManager,
+            ModuleFrame frame) {
+        this.frame = frame;
+        this.wm = windowManager;
+    }
 
-   @Override
-   public void actionPerformed(ActionEvent e) {
-      if (frame.isIcon()) {
-         try {
-            frame.setIcon(false);
-         } catch (PropertyVetoException e1) {}
-      }
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (frame.isIcon()) {
+            try {
+                frame.setIcon(false);
+            } catch (PropertyVetoException e1) {
+            }
+        }
 
-      wm.setSelectedWindow(frame);
-      frame.toFront();
+        wm.setSelectedWindow(frame);
+        frame.toFront();
 
-   }
+    }
 
 }

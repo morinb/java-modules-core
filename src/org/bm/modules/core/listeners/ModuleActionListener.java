@@ -8,25 +8,25 @@ import org.bm.modules.shared.IWindowsManager;
 import org.bm.modules.shared.ModuleFrame;
 
 public class ModuleActionListener implements ActionListener {
-   private final IWindowsManager windowsManager;
+    private final IWindowsManager windowsManager;
 
-   private final IModule module;
+    private final IModule module;
 
-   public ModuleActionListener(IWindowsManager windowsManager, IModule module) {
-      this.windowsManager = windowsManager;
-      this.module = module;
+    public ModuleActionListener(IWindowsManager windowsManager, IModule module) {
+        this.windowsManager = windowsManager;
+        this.module = module;
 
-   }
+    }
 
-   @Override
-   public void actionPerformed(ActionEvent e) {
-      module.attach();
-      final ModuleFrame moduleFrame = module.getModuleFrame();
-      moduleFrame.setTitle(module.getName());
-      if (moduleFrame != null) {
-         windowsManager.addWindow(moduleFrame);
-      }
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        module.attach();
+        final ModuleFrame moduleFrame = module.getModuleFrame();
+        moduleFrame.setTitle(module.getName());
+        if (moduleFrame != null) {
+            windowsManager.addWindow(moduleFrame);
+        }
 
-   }
+    }
 
 }

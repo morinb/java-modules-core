@@ -8,21 +8,21 @@ import org.bm.modules.shared.IModule;
 import org.bm.modules.shared.IWindowsManager;
 
 public class ComponentContainer implements IComponentContainer {
-   private IWindowsManager wm;
+    private IWindowsManager wm;
 
-   @Override
-   public IWindowsManager getWindowManager() {
-      return wm;
-   }
+    @Override
+    public IWindowsManager getWindowManager() {
+        return wm;
+    }
 
-   @Override
-   public void setWindowManager(IWindowsManager wm) {
-      this.wm = wm;
-   }
+    @Override
+    public void setWindowManager(IWindowsManager wm) {
+        this.wm = wm;
+    }
 
-   @Override
-   public Collection<IModule> getModulesList() {
-      return ModulesLoader.loadModules();
-   }
+    @Override
+    public Collection<IModule> getModulesList() {
+        return ModulesLoader.loadModules();
+    }
 
 }
