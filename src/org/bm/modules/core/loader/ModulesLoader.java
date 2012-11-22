@@ -16,90 +16,90 @@ import java.util.jar.Manifest;
 import org.bm.modules.shared.IModule;
 
 public class ModulesLoader {
-    private static ClassLoader classLoader;
+   private static ClassLoader classLoader;
 
-    private static Collection<IModule> loadedModules;
+   private static Collection<IModule> loadedModules;
 
-    public static Collection<IModule> loadModules() {
-        if (loadedModules == null) {
-            loadedModules = reloadModules();
-        }
+   public static Collection<IModule> loadModules() {
+      if (loadedModules == null) {
+         loadedModules = reloadModules();
+      }
 
-        return loadedModules;
-    }
+      return loadedModules;
+   }
 
-    public static Collection<IModule> reloadModules() {
-        List<IModule> modulesList = new ArrayList<IModule>();
+   public static Collection<IModule> reloadModules() {
+      List<IModule> modulesList = new ArrayList<IModule>();
 
-        File[] files = new File("modules").listFiles(new ModulesFilter());
-        final List<URL> modulesFilesURL = new ArrayList<URL>();
-        List<String> modulesClassnames = new ArrayList<String>();
-        for (File moduleFile : files) {
-            JarFile jarFile = null;
+      File[] files = new File("modules").listFiles(new ModulesFilter());
+      final List<URL> modulesFilesURL = new ArrayList<URL>();
+      List<String> modulesClassnames = new ArrayList<String>();
+      for (File moduleFile : files) {
+         JarFile jarFile = null;
+
+         try {
+            jarFile = new JarFile(moduleFile);
+
+            Manifest manifest = jarFile.getManifest();
+
+            String moduleClassname = manifest.getMainAttributes().getValue("Module-Class");
+
+            modulesClassnames.add(moduleClassname);
+            modulesFilesURL.add(moduleFile.toURI().toURL());
+
+         } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         }
+      }
+
+      AccessController.doPrivileged(new PrivilegedAction<Object>() {
+         @Override
+         public Object run() {
+            classLoader = new URLClassLoader(modulesFilesURL.toArray(new URL[modulesFilesURL.size()]), ModulesLoader.class
+               .getClassLoader());
+
+            return null;
+         }
+      });
+
+      if (classLoader != null) {
+         for (String clazz : modulesClassnames) {
 
             try {
-                jarFile = new JarFile(moduleFile);
+               Class<?> moduleClass = Class.forName(clazz, true, classLoader);
 
-                Manifest manifest = jarFile.getManifest();
+               if (IModule.class.isAssignableFrom(moduleClass)) {
+                  @SuppressWarnings("unchecked")
+                  Class<IModule> castedClass = (Class<IModule>) moduleClass;
 
-                String moduleClassname = manifest.getMainAttributes().getValue("Module-Class");
+                  IModule module = castedClass.newInstance();
 
-                modulesClassnames.add(moduleClassname);
-                modulesFilesURL.add(moduleFile.toURI().toURL());
+                  modulesList.add(module);
+               }
 
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+               // TODO Auto-generated catch block
+               e.printStackTrace();
+            } catch (InstantiationException e) {
+               // TODO Auto-generated catch block
+               e.printStackTrace();
+            } catch (IllegalAccessException e) {
+               // TODO Auto-generated catch block
+               e.printStackTrace();
             }
-        }
 
-        AccessController.doPrivileged(new PrivilegedAction<Object>() {
-            @Override
-            public Object run() {
-                classLoader = new URLClassLoader(modulesFilesURL.toArray(new URL[modulesFilesURL.size()]), ModulesLoader.class
-                        .getClassLoader());
+         }
+      }
 
-                return null;
-            }
-        });
+      return modulesList;
+   }
 
-        if (classLoader != null) {
-            for (String clazz : modulesClassnames) {
-
-                try {
-                    Class<?> moduleClass = Class.forName(clazz, true, classLoader);
-
-                    if (IModule.class.isAssignableFrom(moduleClass)) {
-                        @SuppressWarnings("unchecked")
-                        Class<IModule> castedClass = (Class<IModule>) moduleClass;
-
-                        IModule module = castedClass.newInstance();
-
-                        modulesList.add(module);
-                    }
-
-                } catch (ClassNotFoundException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (InstantiationException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-
-            }
-        }
-
-        return modulesList;
-    }
-
-    static class ModulesFilter implements FileFilter {
-        @Override
-        public boolean accept(File pathname) {
-            return pathname.isFile() && pathname.getName().toLowerCase().endsWith(".jar");
-        }
-    }
+   static class ModulesFilter implements FileFilter {
+      @Override
+      public boolean accept(File pathname) {
+         return pathname.isFile() && pathname.getName().toLowerCase().endsWith(".jar");
+      }
+   }
 
 }
