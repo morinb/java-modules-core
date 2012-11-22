@@ -3,6 +3,7 @@ package org.bm.modules.core.loader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.AccessController;
@@ -92,6 +93,15 @@ public class ModulesLoader {
          }
       }
 
+      StringBuilder sb = new StringBuilder();
+      for (URL url : modulesFilesURL) {
+         try {
+            sb.append(url.toURI().getPath()).append(File.pathSeparator);
+         } catch (URISyntaxException e) {
+            sb.append(url.getPath()).append(File.pathSeparator);
+         }
+      }
+      System.setProperty("java.modules.modules.path", sb.toString());
       return modulesList;
    }
 

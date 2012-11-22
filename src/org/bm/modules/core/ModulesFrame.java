@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.Comparator;
 
@@ -20,7 +21,9 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 import org.bm.modules.core.criteria.Arrays;
 import org.bm.modules.core.criteria.Function;
@@ -43,6 +46,8 @@ public class ModulesFrame extends JFrame {
    private JMenu menuWindows;
 
    private Collection<IModule> loadedModules;
+
+   private boolean didSetLaf;
 
    public ModulesFrame() throws HeadlessException {
       super();
@@ -98,8 +103,14 @@ public class ModulesFrame extends JFrame {
    private void initLaF() {
       try {
          UIManager.setLookAndFeel(new SyntheticaStandardLookAndFeel());
-      } catch (Exception e) {
-         e.printStackTrace();
+      } catch (UnsupportedLookAndFeelException e) {
+         try {
+            UIManager.setLookAndFeel(new NimbusLookAndFeel());
+         } catch (UnsupportedLookAndFeelException e1) {}
+      } catch (ParseException e) {
+         try {
+            UIManager.setLookAndFeel(new NimbusLookAndFeel());
+         } catch (UnsupportedLookAndFeelException e1) {}
       }
    }
 
