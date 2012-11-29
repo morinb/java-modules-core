@@ -47,8 +47,6 @@ public class ModulesFrame extends JFrame {
 
    private Collection<IModule> loadedModules;
 
-   private boolean didSetLaf;
-
    public ModulesFrame() throws HeadlessException {
       super();
       init();
